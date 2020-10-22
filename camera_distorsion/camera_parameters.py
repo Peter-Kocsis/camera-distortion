@@ -13,8 +13,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 import json
-import moviepy.editor as mpe
 
+from moviepy.video.io.VideoFileClip import VideoFileClip
 from util import serialize
 from util.io import find_files
 
@@ -159,7 +159,7 @@ class CameraParameters:
         factor = np.append(np.array(image_size) / self.calib_size, 1)
         return self._intrinsic_matrix * factor[:, None]
 
-    def undistort_video(self, video: mpe.VideoFileClip, crop: float):
+    def undistort_video(self, video: VideoFileClip, crop: float):
         width = video.w
         height = video.h
         video_size = (width, height)

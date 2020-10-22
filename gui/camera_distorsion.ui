@@ -1,0 +1,191 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface version="1.0">
+  <object class="tk.Toplevel" id="application">
+    <property name="geometry">1280x720</property>
+    <property name="height">360</property>
+    <property name="iconbitmap">icon.png</property>
+    <property name="iconphoto">icon.png</property>
+    <property name="title" translatable="yes">Media undistorsion</property>
+    <property name="width">720</property>
+    <child>
+      <object class="ttk.Frame" id="main_frame">
+        <property name="height">360</property>
+        <property name="width">720</property>
+        <layout manager="pack">
+          <property name="expand">true</property>
+          <property name="fill">both</property>
+          <property name="propagate">True</property>
+          <property name="side">top</property>
+        </layout>
+        <child>
+          <object class="tk.Frame" id="input_frame">
+            <property name="height">300</property>
+            <property name="width">720</property>
+            <layout manager="pack">
+              <property name="expand">true</property>
+              <property name="fill">both</property>
+              <property name="propagate">True</property>
+              <property name="side">top</property>
+            </layout>
+            <child>
+              <object class="tk.Frame" id="camera_parameter_frame">
+                <property name="height">300</property>
+                <property name="width">360</property>
+                <layout manager="pack">
+                  <property name="expand">false</property>
+                  <property name="fill">both</property>
+                  <property name="propagate">True</property>
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="tk.Button" id="camera_parameters_button">
+                    <property name="text" translatable="yes">Camera parameters</property>
+                    <bind add="" handler="on_camera_parameters_button" sequence="&lt;1&gt;" />
+                    <layout manager="pack">
+                      <property name="propagate">True</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="ttk.Entry" id="camera_parameter_entry">
+                    <layout manager="pack">
+                      <property name="expand">true</property>
+                      <property name="fill">both</property>
+                      <property name="propagate">True</property>
+                      <property name="side">right</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Frame" id="input_media_frame">
+                <property name="height">300</property>
+                <property name="width">360</property>
+                <layout manager="pack">
+                  <property name="expand">true</property>
+                  <property name="fill">both</property>
+                  <property name="propagate">True</property>
+                  <property name="side">right</property>
+                </layout>
+                <child>
+                  <object class="tk.Listbox" id="input_media_files">
+                    <layout manager="pack">
+                      <property name="expand">true</property>
+                      <property name="fill">both</property>
+                      <property name="propagate">True</property>
+                      <property name="side">top</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.Button" id="input_media_button">
+                    <property name="text" translatable="yes">Input media</property>
+                    <bind add="" handler="on_input_media_button" sequence="&lt;1&gt;" />
+                    <layout manager="pack">
+                      <property name="propagate">True</property>
+                      <property name="side">top</property>
+                    </layout>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="tk.Frame" id="output_frame">
+            <layout manager="pack">
+              <property name="expand">false</property>
+              <property name="fill">x</property>
+              <property name="propagate">True</property>
+              <property name="side">top</property>
+            </layout>
+            <child>
+              <object class="tk.Button" id="start_button">
+                <property name="text" translatable="yes">Start</property>
+                <bind add="" handler="on_start_button" sequence="&lt;1&gt;" />
+                <layout manager="pack">
+                  <property name="propagate">True</property>
+                  <property name="side">left</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Button" id="output_path_button">
+                <property name="text" translatable="yes">Output</property>
+                <bind add="" handler="on_output_path_button" sequence="&lt;1&gt;" />
+                <layout manager="pack">
+                  <property name="propagate">True</property>
+                  <property name="side">left</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Entry" id="output_path_entry">
+                <layout manager="pack">
+                  <property name="expand">true</property>
+                  <property name="fill">both</property>
+                  <property name="propagate">True</property>
+                  <property name="side">left</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="ttk.Frame" id="status_frame">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="expand">false</property>
+              <property name="fill">x</property>
+              <property name="propagate">True</property>
+              <property name="side">bottom</property>
+            </layout>
+            <child>
+              <object class="ttk.Label" id="status_label">
+                <property name="anchor">w</property>
+                <property name="borderwidth">1</property>
+                <property name="relief">sunken</property>
+                <property name="text" translatable="yes">Status</property>
+                <layout manager="pack">
+                  <property name="expand">true</property>
+                  <property name="fill">both</property>
+                  <property name="propagate">True</property>
+                  <property name="side">left</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Progressbar" id="image_progress_bar">
+                <property name="length">100</property>
+                <property name="mode">determinate</property>
+                <property name="orient">horizontal</property>
+                <layout manager="pack">
+                  <property name="anchor">e</property>
+                  <property name="expand">false</property>
+                  <property name="propagate">True</property>
+                  <property name="side">left</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Progressbar" id="video_progress_bar">
+                <property name="length">100</property>
+                <property name="mode">determinate</property>
+                <property name="orient">horizontal</property>
+                <layout manager="pack">
+                  <property name="anchor">e</property>
+                  <property name="expand">false</property>
+                  <property name="propagate">True</property>
+                  <property name="side">right</property>
+                </layout>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

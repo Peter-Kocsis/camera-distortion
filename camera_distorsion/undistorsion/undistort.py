@@ -14,15 +14,12 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Union
 from PIL import Image, ExifTags
-import moviepy.editor as mpe
+from moviepy.video.io.VideoFileClip import VideoFileClip
 
 import cv2
 import numpy as np
-
-# create logger
-import pyexiv2
 
 from camera_distorsion.camera_parameters import CameraParameters
 from util import init_logger
@@ -45,60 +42,59 @@ def undistort_argsparser() -> argparse.ArgumentParser:
     return parser
 
 
-def undistort_videos(video_pathes: List[str], out_folder: str, camera_parameters: CameraParameters, crop: float):
-    for video_path in find_videos(video_pathes):
-        logger.info(f"Undistorting video file {video_path}")
-        # Read video
-        video = mpe.VideoFileClip(video_path)
-        file_name, ext = os.path.splitext(os.path.basename(video_path))
+def undistort_video(video_path: str, out_folder: str, camera_parameters: CameraParameters, crop: float):
+    os.makedirs(out_folder, exist_ok=True)
+    logger.info(f"Undistorting video file {video_path}")
+    # Read video
+    video = VideoFileClip(video_path)
+    file_name, ext = os.path.splitext(os.path.basename(video_path))
 
-        if video is None:
-            logger.error(f"Cannot open video file {video_path}!")
-            continue
-        logger.debug(f"Video file {video_path} read")
+    if video is None:
+        logger.error(f"Cannot open video file {video_path}!")
+        return
+    logger.debug(f"Video file {video_path} read")
 
-        # Undistort video
-        undistorted_video = camera_parameters.undistort_video(video, crop)
-        logger.debug(f"Video file {video_path} undistorted")
+    # Undistort video
+    undistorted_video = camera_parameters.undistort_video(video, crop)
+    logger.debug(f"Video file {video_path} undistorted")
 
-        # Save undistorted video
-        undistorted_video_path = os.path.join(out_folder, f"{file_name}_undist{ext}")
-        undistorted_video.write_videofile(filename=undistorted_video_path,
-                                          bitrate=str(video.reader.bitrate) + 'K',
-                                          audio=True,
-                                          audio_fps=video.audio.fps,
-                                          preset="medium",
-                                          audio_codec='aac',
-                                          audio_nbytes=video.audio.reader.nbytes,
-                                          audio_bitrate=str(video.audio.reader.bitrate) + 'K',
-                                          audio_bufsize=video.audio.buffersize)
-        logger.info(f"Undistorted video file saved to {undistorted_video_path}")
-
-
-def undistort_images(video_pathes: List[str], out_folder: str, camera_parameters: CameraParameters, crop: float):
-    for image_path in find_images(video_pathes):
-        logger.info(f"Undistorting image file {image_path}")
-
-        # Read image
-        image = Image.open(image_path)
-        logger.debug(f"Image file {image_path} read")
+    # Save undistorted video
+    undistorted_video_path = os.path.join(out_folder, f"{file_name}_undist{ext}")
+    undistorted_video.write_videofile(filename=undistorted_video_path,
+                                      bitrate=str(video.reader.bitrate) + 'K',
+                                      audio=True,
+                                      audio_fps=video.audio.fps,
+                                      preset="medium",
+                                      audio_codec='aac',
+                                      audio_nbytes=video.audio.reader.nbytes,
+                                      audio_bitrate=str(video.audio.reader.bitrate) + 'K',
+                                      audio_bufsize=video.audio.buffersize)
+    logger.info(f"Undistorted video file saved to {undistorted_video_path}")
 
 
-        # Undistort image
-        image_data = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-        undistorted_image_data = camera_parameters.undistort_image(image_data, crop)
-        undistorted_image = Image.fromarray(cv2.cvtColor(np.array(undistorted_image_data), cv2.COLOR_BGR2RGB))
-        logger.debug(f"Image file {image_path} undistorted")
+def undistort_image(image_path:str, out_folder: str, camera_parameters: CameraParameters, crop: float):
+    os.makedirs(out_folder, exist_ok=True)
+    logger.info(f"Undistorting image file {image_path}")
 
-        # Save undistorted image
-        image_name, ext = os.path.splitext(os.path.basename(image_path))
-        undistorted_image_path = os.path.join(out_folder, f"{image_name}_undist{ext}")
-        with open(undistorted_image_path, 'w') as outfile:
-            undistorted_image.save(outfile, format=get_format(ext), exif=image.info['exif'])
-        logger.info(f"Undistorted image file saved to {undistorted_image_path}")
+    # Read image
+    image = Image.open(image_path)
+    logger.debug(f"Image file {image_path} read")
+
+    # Undistort image
+    image_data = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
+    undistorted_image_data = camera_parameters.undistort_image(image_data, crop)
+    undistorted_image = Image.fromarray(cv2.cvtColor(np.array(undistorted_image_data), cv2.COLOR_BGR2RGB))
+    logger.debug(f"Image file {image_path} undistorted")
+
+    # Save undistorted image
+    image_name, ext = os.path.splitext(os.path.basename(image_path))
+    undistorted_image_path = os.path.join(out_folder, f"{image_name}_undist{ext}")
+    with open(undistorted_image_path, 'w') as outfile:
+        undistorted_image.save(outfile, format=get_format(ext), exif=image.info['exif'])
+    logger.info(f"Undistorted image file saved to {undistorted_image_path}")
 
 
-def undistort(media_pathes: List[str], out_folder: str, parameters_file: str, crop: float):
+def undistort(media_path: Union[List[str], str], out_folder: str, parameters_file: str, crop: float):
     """
     This function undistorts media files given the camera parameters
 
@@ -110,20 +106,20 @@ def undistort(media_pathes: List[str], out_folder: str, parameters_file: str, cr
     os.makedirs(out_folder, exist_ok=True)
 
     logger.info(f"Undistorting images")
-    undistort_images(media_pathes, out_folder, camera_parameters, crop)
+    for image_path in find_images(media_path):
+        undistort_image(image_path, out_folder, camera_parameters, crop)
 
     logger.info(f"Undistorting videos")
-    undistort_videos(media_pathes, out_folder, camera_parameters, crop)
+    for video_path in find_videos(media_path):
+        undistort_video(video_path, out_folder, camera_parameters, crop)
 
     logger.info(f"Undistorsion finished!")
-
-
 
 
 if __name__ == '__main__':
     arguments = undistort_argsparser().parse_args(sys.argv[1:])
     init_logger(logger)
-    undistort(media_pathes=arguments.image_path,
+    undistort(media_path=arguments.image_path,
               out_folder=arguments.out_folder,
               parameters_file=arguments.parameters,
               crop=arguments.crop)
