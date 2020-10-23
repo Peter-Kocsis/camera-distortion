@@ -37,6 +37,12 @@ TkDnD gives support for **drag-and-drop** in the GUI. If not provided, the appli
     * [OSX](https://sourceforge.net/projects/tkdnd/files/OS%20X%20Binaries/TkDND%202.8/tkdnd2.8-OSX-MountainLion.tar.gz/download)
 * Download the TkDnD Python wrapper and place the module TkinterDnD2 in the root of the project
     * [TkDnD python wrapper](https://sourceforge.net/projects/tkinterdnd/files/TkinterDnD2/TkinterDnD2-0.3.zip/download)
+    
+This steps can be done by calling the `install_tkdnd.sh` from the root of the project in case of Linux or MacOS systems or `install_tkdnd.bat` in case of Windows:
+
+```bash
+bash ./gui/install_tkdnd.sh
+```
 
 #### Build application file
 In order to build the `Media undistorsion` app, you should run the following command from the root of the repository:
