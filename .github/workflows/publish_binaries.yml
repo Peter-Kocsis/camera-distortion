@@ -22,7 +22,7 @@ jobs:
         pip install pyinstaller
     - name: Build 
       run: |
-        pyinstaller --name media_undistortion --add-data "./gui/camera_distorsion.ui:." --add-data "./gui/icon.png:." --add-data "./tkdnd2.8:./tkdnd2.8" --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distorsion_app.py
+        pyinstaller --name media_undistortion --add-data "./gui/camera_distorsion.ui:." --add-data "./gui/icon.png:." --add-data "./tkdnd2.8:./tkdnd2.8" --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
     - name: Archive build
       uses: actions/upload-artifact@v2
       with:
