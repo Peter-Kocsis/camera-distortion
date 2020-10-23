@@ -18,7 +18,7 @@ import numpy as np
 from PIL import Image
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
-from camera_distorsion.camera_parameters import CameraParameters
+from camera_distortion.camera_parameters import CameraParameters
 from util import init_logger
 from util.io import get_format, find_videos, find_images
 

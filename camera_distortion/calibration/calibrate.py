@@ -13,7 +13,7 @@ import os
 import sys
 
 # create logger
-from camera_distorsion.camera_parameters import CameraParameters
+from camera_distortion.camera_parameters import CameraParameters
 from util import init_logger
 
 logger = logging.getLogger(__file__)
@@ -41,7 +41,7 @@ def calibrate_argsparser() -> argparse.ArgumentParser:
 def calibrate(image_folder_path: str, calib_width: int, calib_height: int, calib_size: float, camera_name:str, show_points: bool):
     """
     This function determines the camera calibration parameters using 'png' and 'jpg' calibration image_pathes
-    about a checkerboard calibration image which can be used for undistorsion later.
+    about a checkerboard calibration image which can be used for undistortion later.
     It is assumed that the checkerboard squares are square.
     The checkerboard corners are located on the grayscale image. If the points are not found that image
     is skipped.

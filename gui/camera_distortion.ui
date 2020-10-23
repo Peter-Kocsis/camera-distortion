@@ -5,7 +5,7 @@
     <property name="height">360</property>
     <property name="iconbitmap">icon.png</property>
     <property name="iconphoto">icon.png</property>
-    <property name="title" translatable="yes">Media undistorsion</property>
+    <property name="title" translatable="yes">Media undistortion</property>
     <property name="width">720</property>
     <child>
       <object class="ttk.Frame" id="main_frame">

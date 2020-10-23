@@ -4,16 +4,21 @@ import sys
 import threading
 import tkinter as tk
 import tkinter.ttk as ttk
+import warnings
 from tkinter import filedialog as fd
 from tkinter import messagebox
 from typing import List
 from urllib.parse import urlparse
 
 import pygubu
-from camera_distorsion.camera_parameters import CameraParameters
-from camera_distorsion.undistorsion.undistort import undistort_image, undistort_video
-from TkinterDnD2 import *
+from camera_distortion.camera_parameters import CameraParameters
+from camera_distortion.undistortion.undistort import undistort_image, undistort_video
 from util.io import find_images, find_videos
+
+try:
+    from TkinterDnD2 import *
+except ImportError:
+    pass
 
 try:
     # PyInstaller creates a temp folder and stores path in _MEIPASS
@@ -32,7 +37,7 @@ class CameraDistorsionApp:
     def __init__(self):
         self.builder = builder = pygubu.Builder()
         builder.add_resource_path(RESOURCE_PATH)
-        builder.add_from_file(os.path.join(RESOURCE_PATH, "camera_distorsion.ui"))
+        builder.add_from_file(os.path.join(RESOURCE_PATH, "camera_distortion.ui"))
         self.mainwindow = builder.get_object('application')
         if self._load_tkdnd():
             self.bind_dnd_targets()
@@ -41,9 +46,12 @@ class CameraDistorsionApp:
         builder.connect_callbacks(self)
 
     def _load_tkdnd(self):
+        if "TkinterDnD2" not in sys.modules:
+            self.logger.warning("Tkdnd python wrapper not found, drag-and-drop won't be supported!")
+            return False
+
         tkdndlib_project = os.path.join(PROJECT_PATH, 'tkdnd2.8')
         tkdndlib_env = os.environ.get('TKDND_LIBRARY')
-
         if os.path.exists(tkdndlib_project):
             tkdndlib = tkdndlib_project
         elif tkdndlib_env and os.path.exists(tkdndlib_env):
@@ -53,14 +61,11 @@ class CameraDistorsionApp:
                                                f"neither under environment variable TKDND_LIBRARY, "
                                                f"drag-and-drop won't be supported!")
             return False
-
-        if tkdndlib:
-            self.mainwindow.tk.eval('global auto_path; lappend auto_path {%s}' % tkdndlib)
-
         try:
+            self.mainwindow.tk.eval(f"global auto_path; lappend auto_path {{{tkdndlib}}}")
             self.mainwindow.tk.call('package', 'require', 'tkdnd')
         except tk.TclError:
-            CameraDistorsionApp.logger.warning('Unable to load tkdnd library.')
+            CameraDistorsionApp.logger.warning("Unable to load tkdnd library.")
             return False
         return True
 
@@ -206,6 +211,42 @@ class CameraDistorsionApp:
         self.mainwindow.mainloop()
 
 
+if sys.platform.lower().startswith('win'):
+    import ctypes
+
+    def hide_console():
+        """
+        Hides the console window in GUI mode. Necessary for frozen application, because
+        this application support both, command line processing AND GUI mode and theirfor
+        cannot be run via pythonw.exe.
+        """
+
+        whnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if whnd != 0:
+            ctypes.windll.user32.ShowWindow(whnd, 0)
+            # if you wanted to close the handles...
+            #ctypes.windll.kernel32.CloseHandle(whnd)
+
+    def show_console():
+        """Unhides console window"""
+        whnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if whnd != 0:
+            ctypes.windll.user32.ShowWindow(whnd, 1)
+else:
+    def hide_console():
+        pass
+
+    def show_console():
+        pass
+
+
 if __name__ == '__main__':
+    app_frozen = getattr(sys, 'frozen', False)
+    if app_frozen:
+        hide_console()
+
     app = CameraDistorsionApp()
     app.run()
+
+    if app_frozen:
+        show_console()
