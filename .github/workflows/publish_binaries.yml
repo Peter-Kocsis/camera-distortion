@@ -1,0 +1,26 @@
+name: Publish
+
+on: [push]
+
+jobs:
+  build-linux:
+    name: Publish binaries
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install pyinstaller
+    - name: Build 
+      run: |
+        pyinstaller --name media_undistortion --add-data "./gui/camera_distorsion.ui;." --add-data "./gui/icon.png;." --add-data "./tkdnd2.8;./tkdnd2.8" --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distorsion_app.py
+
