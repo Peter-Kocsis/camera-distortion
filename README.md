@@ -40,7 +40,7 @@ TkDnD gives support for **drag-and-drop** in the GUI. If not provided, the appli
 #### Build application file
 In order to build the `Media undistorsion` app, you should run the following command from the root of the repository:
 ```bash
-pyinstaller --name media_undistortion --add-data "./gui/camera_distorsion.ui;." --add-data "./gui/icon.png;." --add-data "./tkdnd2.8;./tkdnd2.8" --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
+pyinstaller --name media_undistortion --add-data "./gui/camera_distortion.ui;." --add-data "./gui/icon.png;." --add-data "./tkdnd2.8;./tkdnd2.8" --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
 ```
 
 ## References
