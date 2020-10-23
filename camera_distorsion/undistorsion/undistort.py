@@ -8,22 +8,19 @@ __email__ = "peter.kocsis@tum.de"
 __status__ = "Beta"
 
 import argparse
-import datetime
 import logging
 import os
-import subprocess
 import sys
-from pathlib import Path
 from typing import List, Union
-from PIL import Image, ExifTags
-from moviepy.video.io.VideoFileClip import VideoFileClip
 
 import cv2
 import numpy as np
+from PIL import Image
+from moviepy.video.io.VideoFileClip import VideoFileClip
 
 from camera_distorsion.camera_parameters import CameraParameters
 from util import init_logger
-from util.io import find_files, get_format, find_videos, find_images
+from util.io import get_format, find_videos, find_images
 
 logger = logging.getLogger(__file__)
 

@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 import threading
@@ -11,30 +12,57 @@ from urllib.parse import urlparse
 import pygubu
 from camera_distorsion.camera_parameters import CameraParameters
 from camera_distorsion.undistorsion.undistort import undistort_image, undistort_video
-from gui.tkdnd import TkDND
+from TkinterDnD2 import *
 from util.io import find_images, find_videos
 
 try:
     # PyInstaller creates a temp folder and stores path in _MEIPASS
     PROJECT_PATH = sys._MEIPASS
+    RESOURCE_PATH = PROJECT_PATH
 except Exception:
-    PROJECT_PATH = os.path.dirname(__file__)
-PROJECT_UI = os.path.join(PROJECT_PATH, "camera_distorsion.ui")
+    PROJECT_PATH = os.getcwd()
+    RESOURCE_PATH = os.path.join(PROJECT_PATH, "gui")
 
 _flatten = lambda t: [item for sublist in t for item in sublist]
 
 
 class CameraDistorsionApp:
+    logger = logging.getLogger(__name__)
+
     def __init__(self):
         self.builder = builder = pygubu.Builder()
-        builder.add_resource_path(PROJECT_PATH)
-        builder.add_from_file(PROJECT_UI)
+        builder.add_resource_path(RESOURCE_PATH)
+        builder.add_from_file(os.path.join(RESOURCE_PATH, "camera_distorsion.ui"))
         self.mainwindow = builder.get_object('application')
-        self.dnd = TkDND(self.mainwindow)
-        builder.connect_callbacks(self)
-        self.bind_dnd_targets()
+        if self._load_tkdnd():
+            self.bind_dnd_targets()
         self._gui_update_interval = 100
         self._automatic_gui_update()
+        builder.connect_callbacks(self)
+
+    def _load_tkdnd(self):
+        tkdndlib_project = os.path.join(PROJECT_PATH, 'tkdnd2.8')
+        tkdndlib_env = os.environ.get('TKDND_LIBRARY')
+
+        if os.path.exists(tkdndlib_project):
+            tkdndlib = tkdndlib_project
+        elif tkdndlib_env and os.path.exists(tkdndlib_env):
+            tkdndlib = tkdndlib_env
+        else:
+            CameraDistorsionApp.logger.warning(f"Tkdnd not found nor at {tkdndlib_project}, "
+                                               f"neither under environment variable TKDND_LIBRARY, "
+                                               f"drag-and-drop won't be supported!")
+            return False
+
+        if tkdndlib:
+            self.mainwindow.tk.eval('global auto_path; lappend auto_path {%s}' % tkdndlib)
+
+        try:
+            self.mainwindow.tk.call('package', 'require', 'tkdnd')
+        except tk.TclError:
+            CameraDistorsionApp.logger.warning('Unable to load tkdnd library.')
+            return False
+        return True
 
     def bind_dnd_targets(self):
         element_callback_dict = {"output_path_entry": self.on_output_path_dnd,
@@ -42,7 +70,8 @@ class CameraDistorsionApp:
                                  "camera_parameter_entry": self.on_camera_parameter_dnd}
         for element_name, callback in element_callback_dict.items():
             element = self.builder.get_object(element_name)
-            self.dnd.bindtarget(element, callback, 'text/plain;charset=UTF-8')
+            element.drop_target_register(CF_HDROP)
+            element.dnd_bind('<<Drop>>', callback)
 
     def _insert_elements_to_listbox(self, listbox, elements):
         for element in elements:
@@ -58,11 +87,6 @@ class CameraDistorsionApp:
         pathes = []
         uries: List[str] = uri_pathes.split()
         for uri in uries:
-            if not uri.startswith("file://"):
-                messagebox.showerror(f"Invalid path",
-                                     f"The provided path {uri} is not a valid path for a file or folder!")
-                continue
-
             p = urlparse(uri)
             pathes.append(os.path.abspath(os.path.join(p.netloc, p.path)))
         return pathes
@@ -73,9 +97,9 @@ class CameraDistorsionApp:
         self._insert_elements_to_listbox(listbox, pathes)
 
     def on_camera_parameters_button(self, event=None):
-        output_path = fd.askdirectory()
+        output_path = fd.askopenfilename()
 
-        output_path_entry: tk.Entry = self.builder.get_object("output_path_entry")
+        output_path_entry: tk.Entry = self.builder.get_object("camera_parameter_entry")
         output_path_entry.delete(0, tk.END)
         output_path_entry.insert(0, output_path)
 
@@ -185,4 +209,3 @@ class CameraDistorsionApp:
 if __name__ == '__main__':
     app = CameraDistorsionApp()
     app.run()
-

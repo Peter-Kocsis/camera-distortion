@@ -8,7 +8,6 @@ __email__ = "peter.kocsis@tum.de"
 __status__ = "Beta"
 
 import logging
-from pathlib import Path
 
 import cv2
 import numpy as np

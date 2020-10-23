@@ -1,7 +1,4 @@
 """Module for collecting calibration images from video"""
-
-
-
 __author__ = "Peter Kocsis"
 __copyright__ = "Peter Kocsis"
 __credits__ = []

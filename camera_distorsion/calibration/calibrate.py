@@ -11,10 +11,6 @@ import argparse
 import logging
 import os
 import sys
-from pathlib import Path
-
-import cv2
-import numpy as np
 
 # create logger
 from camera_distorsion.camera_parameters import CameraParameters
