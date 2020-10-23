@@ -27,4 +27,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: media_undistortion
-          path: dist/*
+          path: dist
