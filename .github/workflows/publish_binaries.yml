@@ -5,9 +5,16 @@ on: [push]
 jobs:
   build-linux:
     name: Publish binaries
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
-      max-parallel: 5
+      matrix:
+        include:
+          - os: ubuntu-latest
+            data_separator: ":"
+          - os: windows-latest
+            data_separator: ";"
+          - os: macos-latest
+            data_separator: ":"
 
     steps:
     - uses: actions/checkout@v2
@@ -22,9 +29,4 @@ jobs:
         pip install pyinstaller
     - name: Build 
       run: |
-        pyinstaller --name media_undistortion --add-data "./gui/camera_distortion.ui:." --add-data "./gui/icon.png:." --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
-    - name: Archive build
-      uses: actions/upload-artifact@v2
-      with:
-        name: media_undistortion
-        path: dist
+        pyinstaller --name media_undistortion --add-data "./gui/camera_distortion.ui${{ matrix.data_separator }}." --add-data "./gui/icon.png${{ matrix.data_separator }}." --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
