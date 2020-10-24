@@ -1,10 +1,10 @@
 @echo OFF
 
-if "%PROCESSOR_ARCHITECTURE%"=="AMD64"; then
+if "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
   set TKDND_LIB_URL="https://sourceforge.net/projects/tkdnd/files/Windows%%20Binaries/TkDND%%202.8/tkdnd2.8-win32-x86_64.tar.gz/download"
-else
+) else (
   set TKDND_LIB_URL="https://sourceforge.net/projects/tkdnd/files/Windows%%20Binaries/TkDND%%202.8/tkdnd2.8-win32-ix86.tar.gz/download"
-fi
+)
 set TKDND_WRAPPER_URL="https://sourceforge.net/projects/tkinterdnd/files/TkinterDnD2/TkinterDnD2-0.3.zip/download"
 
 Rem Downloading the TkDnD library

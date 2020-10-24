@@ -1,10 +1,16 @@
-name: Publish
+name: Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+    pull_request:
+      branches:
+        - main
 
 jobs:
-  build-linux:
-    name: Publish binaries
+  build:
+    name: Build binaries
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -35,3 +41,8 @@ jobs:
     - name: Build 
       run: |
         pyinstaller --name media_undistortion --add-data "./gui/camera_distortion.ui${{ matrix.data_separator }}." --add-data "./gui/icon.png${{ matrix.data_separator }}." --add-data "./tkdnd2.8${{ matrix.data_separator }}./tkdnd2.8" --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
+    - name: Archive build
+      uses: actions/upload-artifact@v2
+      with:
+        name: Application
+        path: dist

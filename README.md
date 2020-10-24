@@ -1,5 +1,5 @@
 # Camera distorsion
-![example workflow name](https://github.com/Peter-Kocsis/camera-distortion/workflows/Publish/badge.svg)
+![example workflow name](https://github.com/Peter-Kocsis/camera-distortion/workflows/Build/badge.svg)
 
 A module for handling camera distorsion. Originally developed for fisheye-removal.
 
