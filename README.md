@@ -1,4 +1,5 @@
 # Camera distorsion
+![example workflow name](https://github.com/Peter-Kocsis/camera-distortion/workflows/Build/badge.svg)
 
 A module for handling camera distorsion. Originally developed for fisheye-removal.
 
@@ -36,11 +37,17 @@ TkDnD gives support for **drag-and-drop** in the GUI. If not provided, the appli
     * [OSX](https://sourceforge.net/projects/tkdnd/files/OS%20X%20Binaries/TkDND%202.8/tkdnd2.8-OSX-MountainLion.tar.gz/download)
 * Download the TkDnD Python wrapper and place the module TkinterDnD2 in the root of the project
     * [TkDnD python wrapper](https://sourceforge.net/projects/tkinterdnd/files/TkinterDnD2/TkinterDnD2-0.3.zip/download)
+    
+This steps can be done by calling the `install_tkdnd.sh` from the root of the project in case of Linux or MacOS systems or `install_tkdnd.bat` in case of Windows:
+
+```bash
+bash ./gui/install_tkdnd.sh
+```
 
 #### Build application file
 In order to build the `Media undistorsion` app, you should run the following command from the root of the repository:
 ```bash
-pyinstaller --name media_undistortion --add-data "./gui/camera_distorsion.ui;." --add-data "./gui/icon.png;." --add-data "./tkdnd2.8;./tkdnd2.8" --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distorsion_app.py
+pyinstaller --name media_undistortion --add-data "./gui/camera_distortion.ui;." --add-data "./gui/icon.png;." --add-data "./tkdnd2.8;./tkdnd2.8" --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
 ```
 
 ## References
