@@ -42,8 +42,10 @@ jobs:
     - name: Build 
       run: |
         pyinstaller --name media_undistortion --add-data "./gui/camera_distortion.ui${{ matrix.data_separator }}." --add-data "./gui/icon.png${{ matrix.data_separator }}." --add-data "./tkdnd2.8${{ matrix.data_separator }}./tkdnd2.8" --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
+    - name: Lint
+      uses: ricardochaves/python-lint@v1.3.0
     - name: Archive build
       uses: actions/upload-artifact@v2
       with:
-        name: Application
+        name: ${{ runner.os }}
         path: dist
