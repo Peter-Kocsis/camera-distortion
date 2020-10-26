@@ -25,22 +25,20 @@ from urllib.parse import urlparse
 
 import pygubu
 from camera_distortion.calibration import calibrate
-from camera_distortion.camera_model import CameraModel
+from camera_distortion.camera_model import CameraModel, CalibrationPattern
 from camera_distortion.collect import collect_calibration_images
 from camera_distortion.undistortion.undistort import undistort_image, undistort_video
-from util import init_logger
+from util.logger import init_logger
 from util.io import find_images, find_videos
 
 try:
-    from TkinterDnD2 import *
+    from TkinterDnD2 import DND_ALL
 except ImportError:
     pass
 
 try:
     # PyInstaller creates a temp folder and stores path in _MEIPASS
-    # noinspection PyUnresolvedReferences
-    # noinspection PyProtectedMember
-    PROJECT_PATH = sys._MEIPASS
+    PROJECT_PATH = sys._MEIPASS  # pylint: disable=protected-access
     RESOURCE_PATH = PROJECT_PATH
 except AttributeError:
     PROJECT_PATH = os.getcwd()
@@ -61,8 +59,10 @@ class _PathType(Enum):
     DIRECTORY = "directory"
 
 
-_FILEDIALOG_ASK_PATH = {_PathType.FILE: fd.askopenfilename,
-                        _PathType.DIRECTORY: fd.askdirectory}
+_FILEDIALOG_ASK_PATH = {
+    _PathType.FILE: fd.askopenfilename,
+    _PathType.DIRECTORY: fd.askdirectory,
+}
 
 
 class CameraDistortionApp:
@@ -70,6 +70,7 @@ class CameraDistortionApp:
     Class for the application.
     It is responsible for creating the GUI and handling the events.
     """
+
     logger = logging.getLogger(__name__)
 
     def __init__(self):
@@ -80,8 +81,14 @@ class CameraDistortionApp:
         self.builder = builder = pygubu.Builder()
         builder.add_resource_path(RESOURCE_PATH)
         builder.add_from_file(os.path.join(RESOURCE_PATH, "camera_distortion.ui"))
-        self.mainwindow = builder.get_object('application')
+        self.mainwindow: tk.Tk = builder.get_object("application")
         self.status_label: tk.Label = self.builder.get_object("status_label")
+        self.image_progress_bar: ttk.Progressbar = self.builder.get_object(
+            "image_progress_bar"
+        )
+        self.video_progress_bar: ttk.Progressbar = self.builder.get_object(
+            "video_progress_bar"
+        )
         if self._load_tkdnd():
             self._bind_dnd_targets()
         self._gui_update_interval = 100
@@ -94,23 +101,30 @@ class CameraDistortionApp:
         Loads the tkdnd library, which is required for drag-and-drop support
         """
         if "TkinterDnD2" not in sys.modules:
-            self.logger.warning("Tkdnd python wrapper not found, drag-and-drop won't be supported!")
+            self.logger.warning(
+                "Tkdnd python wrapper not found, drag-and-drop won't be supported!"
+            )
             return False
 
-        tkdndlib_project = os.path.join(PROJECT_PATH, 'tkdnd2.8')
-        tkdndlib_env = os.environ.get('TKDND_LIBRARY')
+        tkdndlib_project = os.path.join(PROJECT_PATH, "tkdnd2.8")
+        tkdndlib_env = os.environ.get("TKDND_LIBRARY")
         if os.path.exists(tkdndlib_project):
             tkdndlib = tkdndlib_project
         elif tkdndlib_env and os.path.exists(tkdndlib_env):
             tkdndlib = tkdndlib_env
         else:
-            CameraDistortionApp.logger.warning(f"Tkdnd not found nor at {tkdndlib_project}, "
-                                               f"neither under environment variable TKDND_LIBRARY, "
-                                               f"drag-and-drop won't be supported!")
+            CameraDistortionApp.logger.warning(
+                "Tkdnd not found nor at %s, "
+                "neither under environment variable TKDND_LIBRARY, "
+                "drag-and-drop won't be supported!",
+                tkdndlib_project,
+            )
             return False
         try:
-            self.mainwindow.tk.eval(f"global auto_path; lappend auto_path {{{tkdndlib}}}")
-            self.mainwindow.tk.call('package', 'require', 'tkdnd')
+            self.mainwindow.tk.eval(
+                f"global auto_path; lappend auto_path {{{tkdndlib}}}"
+            )
+            self.mainwindow.tk.call("package", "require", "tkdnd")
         except tk.TclError:
             CameraDistortionApp.logger.warning("Unable to load tkdnd library.")
             return False
@@ -120,8 +134,10 @@ class CameraDistortionApp:
         """
         Binds the entry-change callbacks
         """
-        var_callback_dir = {"camera_parameter_entry_var": self._on_camera_parameter_entry,
-                            "calibrate_entry_var": self._on_calibrate_entry}
+        var_callback_dir = {
+            "camera_parameter_entry_var": self._on_camera_parameter_entry,
+            "calibrate_entry_var": self._on_calibrate_entry,
+        }
         for variable_name, callback in var_callback_dir.items():
             variable: tk.StringVar = self.builder.get_variable(variable_name)
             variable.trace_add("write", callback)
@@ -130,15 +146,17 @@ class CameraDistortionApp:
         """
         Binds the drag-and-drop callbacks
         """
-        element_callback_dict = {"collect_entry": self._on_dnd_entry,
-                                 "calibrate_entry": self._on_dnd_entry,
-                                 "camera_parameter_entry": self._on_dnd_entry,
-                                 "output_path_entry": self._on_dnd_entry,
-                                 "input_media_files": self._on_dnd_list}
+        element_callback_dict = {
+            "collect_entry": self._on_dnd_entry,
+            "calibrate_entry": self._on_dnd_entry,
+            "camera_parameter_entry": self._on_dnd_entry,
+            "output_path_entry": self._on_dnd_entry,
+            "input_media_files": self._on_dnd_list,
+        }
         for element_name, callback in element_callback_dict.items():
             element = self.builder.get_object(element_name)
             element.drop_target_register(DND_ALL)
-            element.dnd_bind('<<Drop>>', callback)
+            element.dnd_bind("<<Drop>>", callback)
 
     @staticmethod
     def _insert_elements_to_listbox(listbox: tk.Listbox, elements: Iterable):
@@ -172,8 +190,8 @@ class CameraDistortionApp:
         for match in re.finditer(pattern, uri_pathes):
             groups = match.groups()
             uri = groups[0] or groups[1]
-            p = urlparse(uri)
-            pathes.append(os.path.abspath(os.path.join(p.netloc, p.path)))
+            path = urlparse(uri)
+            pathes.append(os.path.abspath(os.path.join(path.netloc, path.path)))
         return pathes
 
     @staticmethod
@@ -185,8 +203,8 @@ class CameraDistortionApp:
         for child in frame.winfo_children():
             wtype = child.winfo_class()
             print(wtype)
-            if wtype not in ('Frame', 'Labelframe'):
-                child.configure(state='normal')
+            if wtype not in ("Frame", "Labelframe"):
+                child.configure(state="normal")
             else:
                 CameraDistortionApp._enable_frame(child)
 
@@ -198,8 +216,8 @@ class CameraDistortionApp:
         """
         for child in frame.winfo_children():
             wtype = child.winfo_class()
-            if wtype not in ('Frame', 'Labelframe'):
-                child.configure(state='disable')
+            if wtype not in ("Frame", "Labelframe"):
+                child.configure(state="disable")
             else:
                 CameraDistortionApp._disable_frame(child)
 
@@ -222,10 +240,12 @@ class CameraDistortionApp:
         """
         paths = CameraDistortionApp._parse_uries(event.data)
         if len(paths) > 1:
-            messagebox.showerror(f"Invalid path",
-                                 f"Only one path can be used as output, more was provided: {paths}")
+            messagebox.showerror(
+                "Invalid path",
+                "Only one path can be used as output, more was provided: {paths}",
+            )
             return
-        elif len(paths) == 0:
+        if len(paths) == 0:
             return
 
         event.widget.delete(0, tk.END)
@@ -234,38 +254,50 @@ class CameraDistortionApp:
     @staticmethod
     def _on_input_frame_button(event, input_type: _PathType):
         """
-        Callback for click on input frame button. It will ask for a path and set the frame's entry value
+        Callback for click on input frame button. It will ask for a path
+        and set the frame's entry value
         :param event: The event object
         :param input_type: The type of the path which is requested
         """
         path = _FILEDIALOG_ASK_PATH[input_type]()
 
-        entry = event.widget.master.children['!entry']
+        entry = event.widget.master.children["!entry"]
         entry.delete(0, tk.END)
         entry.insert(0, path)
 
     def _on_browse_collect_button(self, event=None):
         """
         Callback for click on browse collect button
+        :param event: The event object
         """
         self._on_input_frame_button(event, _PathType.FILE)
 
+    # pylint: disable=unused-argument
     def _on_collect_button(self, event=None):
         """
         Callback for click on collect button
+        :param event: The event object
         """
-        self._collect()
+        self._start_in_thread(self._collect)
 
     def _on_browse_calibrate_button(self, event=None):
         """
         Callback for click on browse calibrate button
+        :param event: The event object
         """
         self._on_input_frame_button(event, _PathType.DIRECTORY)
 
     def _on_calibrate_button(self, event=None):
-        self._calibrate()
+        """
+        Callback for click on calibrate button
+        :param event: The event object
+        """
+        self._start_in_thread(self._calibrate)
 
     def _on_calibrate_entry(self, name, index, mode):
+        """
+        Callback for change on claibrate entry
+        """
         calibrate_entry: tk.Entry = self.builder.get_object("calibrate_entry")
         entry_value = calibrate_entry.get()
         if len(entry_value) != 0:
@@ -273,17 +305,19 @@ class CameraDistortionApp:
         else:
             self._enable_frame(self.builder.get_object("collect_frame"))
 
-
-    # noinspection PyUnusedLocal
     def _on_browse_camera_parameters_button(self, event=None):
         """
         Callback for click on camera parameters button
-        This method will start a browsing for a single file and place the path into the `camera_parameter_entry`
+        This method will start a browsing for a single file
+        and place the path into the `camera_parameter_entry`
         :param event: The event object
         """
         self._on_input_frame_button(event, _PathType.FILE)
 
     def _on_camera_parameter_entry(self, name, index, mode):
+        """
+        Callback for change on calibrate entry
+        """
         calibrate_entry: tk.Entry = self.builder.get_object("camera_parameter_entry")
         entry_value = calibrate_entry.get()
         if len(entry_value) != 0:
@@ -291,22 +325,21 @@ class CameraDistortionApp:
         else:
             self._enable_frame(self.builder.get_object("calibration_frame"))
 
-    # noinspection PyUnusedLocal
     def _on_browse_input_media_button(self, event=None):
         """
         Callback for click on input media button
-        This method will start a browsing for files or folders and place the paths into the `input_media_files` listbox
+        This method will start a browsing for files or folders
+        and place the paths into the `input_media_files` listbox
         :param event: The event object
         """
         file_list = self.builder.get_object("input_media_files")
         self._find_and_add_files(file_list)
 
-    # noinspection PyUnusedLocal
-
     def _on_browse_output_path_button(self, event=None):
         """
         Callback for click on output path button
-        This method will start a browsing for a single folder and place the path into the `output_path_entry`
+        This method will start a browsing for a single folder
+        and place the path into the `output_path_entry`
         :param event: The event object
         """
         self._on_input_frame_button(event, _PathType.DIRECTORY)
@@ -319,32 +352,38 @@ class CameraDistortionApp:
         self.mainwindow.after(self._gui_update_interval, self._automatic_gui_update)
 
     def _collect(self):
-        self.status_label.config(text=f"Collecting calibration images")
+        self.status_label.config(text="Collecting calibration images")
 
         collect_entry: tk.Entry = self.builder.get_object("collect_entry")
         video_path = collect_entry.get()
         if len(video_path) == 0:
-            self.status_label.config(text=f"Unable to collect images, no calibration video has been given!")
+            self.status_label.config(
+                text="Unable to collect images, no calibration video has been given!"
+            )
             return
 
         num_of_images = 2
         output_path = os.path.join(os.path.dirname(video_path), "calib_images")
-        collect_calibration_images(video_path=video_path, output_path=output_path, num_of_images=num_of_images)
+        collect_calibration_images(
+            video_path=video_path, output_path=output_path, num_of_images=num_of_images
+        )
 
         calibrate_entry: tk.Entry = self.builder.get_object("calibrate_entry")
         calibrate_entry.delete(0, tk.END)
         calibrate_entry.insert(0, output_path)
 
-        self.status_label.config(text=f"Calibration images collected")
+        self.status_label.config(text="Calibration images collected")
 
     def _calibrate(self):
-        self.status_label.config(text=f"Calibrating the camera model")
+        self.status_label.config(text="Calibrating the camera model")
 
         calibrare_entry: tk.Entry = self.builder.get_object("calibrate_entry")
         image_folder_path = calibrare_entry.get()
         if len(image_folder_path) == 0:
-            self.status_label.config(text=f"Unable to calibrate camera the model, "
-                                          f"no calibration images have been given!")
+            self.status_label.config(
+                text="Unable to calibrate camera the model, "
+                "no calibration images have been given!"
+            )
             return
 
         calib_width = 9
@@ -353,17 +392,20 @@ class CameraDistortionApp:
         camera_name = "custom"
         show_points = False
 
-        params_file = calibrate(image_folder_path=image_folder_path,
-                                calib_width=calib_width,
-                                calib_height=calib_height,
-                                calib_size=calib_size,
-                                camera_name=camera_name,
-                                show_points=show_points)
+        calib_pattern = CalibrationPattern(
+            calib_width=calib_width, calib_height=calib_height, calib_size=calib_size
+        )
+        params_file = calibrate(
+            image_folder_path=image_folder_path,
+            calib_pattern=calib_pattern,
+            camera_name=camera_name,
+            show_points=show_points,
+        )
 
         calibrate_entry: tk.Entry = self.builder.get_object("camera_parameter_entry")
         calibrate_entry.delete(0, tk.END)
         calibrate_entry.insert(0, params_file)
-        self.status_label.config(text=f"Calibration finished")
+        self.status_label.config(text="Calibration finished")
 
     def _undistort(self):
         """
@@ -371,40 +413,36 @@ class CameraDistortionApp:
         given the camera parameters defined in the camera parameters entry and
         saves to the output path defined in the output path entry
         """
-        image_progress_bar: ttk.Progressbar = self.builder.get_object("image_progress_bar")
-        video_progress_bar: ttk.Progressbar = self.builder.get_object("video_progress_bar")
 
-        camera_parameter_list: tk.Entry = self.builder.get_object("camera_parameter_entry")
-        parameters_file = camera_parameter_list.get()
+        parameters_file = self.builder.get_object("camera_parameter_entry").get()
         if len(parameters_file) == 0:
-            self.status_label.config(text=f"Unable to start undistortion, no parameter file has been given!")
+            self.status_label.config(
+                text="Unable to start undistortion, no parameter file has been given!"
+            )
             return
 
         input_media_list: tk.Listbox = self.builder.get_object("input_media_files")
         media_pathes = list(input_media_list.get(0, tk.END))
         if len(media_pathes) == 0:
-            self.status_label.config(text=f"Unable to start undistortion, no input media has been given!")
+            self.status_label.config(
+                text="Unable to start undistortion, no input media has been given!"
+            )
             return
 
-        output_path_entry: tk.Entry = self.builder.get_object("output_path_entry")
-        out_folder = output_path_entry.get()
+        out_folder = self.builder.get_object("output_path_entry").get()
         if len(out_folder) == 0:
-            self.status_label.config(text=f"Unable to start undistortion, no output path has been given!")
+            self.status_label.config(
+                text="Unable to start undistortion, no output path has been given!"
+            )
             return
-
-        crop = 0
 
         all_images = [find_images(media_path) for media_path in media_pathes]
         all_videos = [find_videos(media_path) for media_path in media_pathes]
 
-        num_images = len(_flatten(all_images))
-        num_videos = len(_flatten(all_videos))
-
-        num_undist_images = 0
-        num_undist_videos = 0
+        self.image_progress_bar["maximum"] = len(_flatten(all_images))
+        self.video_progress_bar["maximum"] = len(_flatten(all_videos))
 
         camera_parameters = CameraModel.from_json(parameters_file)
-        os.makedirs(out_folder, exist_ok=True)
 
         for idx, media_path in enumerate(media_pathes):
             input_media_list.itemconfig(idx, bg="gold")
@@ -413,32 +451,45 @@ class CameraDistortionApp:
                 rel_path = os.path.relpath(image_path, media_path)
                 out_path = os.path.join(out_folder, os.path.dirname(rel_path))
                 self.status_label.config(text=f"Undistorting {media_path} - {rel_path}")
-                undistort_image(image_path, out_path, camera_parameters, crop)
-                num_undist_images += 1
-                image_progress_bar["value"] = 100 * num_undist_images / num_images
+                undistort_image(image_path, out_path, camera_parameters, crop=0)
+                self.image_progress_bar["value"] += 1
 
             for video_path in all_videos[idx]:
                 rel_path = os.path.relpath(video_path, media_path)
                 out_path = os.path.join(out_folder, os.path.dirname(rel_path))
                 self.status_label.config(text=f"Undistorting {media_path} - {rel_path}")
-                undistort_video(video_path, out_path, camera_parameters, crop)
-                num_undist_videos += 1
-                video_progress_bar["value"] = 100 * num_undist_videos / num_videos
+                undistort_video(video_path, out_path, camera_parameters, crop=0)
+                self.video_progress_bar["value"] += 1
 
             input_media_list.itemconfig(idx, bg="green")
 
-        image_progress_bar["value"] = 0
-        video_progress_bar["value"] = 0
-        self.status_label.config(text=f"Undistortion finished")
+        self.image_progress_bar["value"] = 0
+        self.video_progress_bar["value"] = 0
+        self.status_label.config(text="Undistortion finished")
 
-    # noinspection PyUnusedLocal
     def _on_start_button(self, event=None):
         """
         Callback for click on start button
         :param event: The event object
         """
-        t1 = threading.Thread(target=self._undistort)
-        t1.start()
+        self._start_in_thread(self._undistort)
+
+    @staticmethod
+    def _start_in_thread(method):
+        """
+        Start method in separate thread to not block the UI
+        :param method: The moethod to start
+        :returns: The started thread
+        """
+        thread = threading.Thread(target=method)
+        thread.start()
+        return thread
+
+    def get_state(self):
+        """
+        Stops the application
+        """
+        return self.mainwindow.state
 
     def run(self):
         """
@@ -447,15 +498,16 @@ class CameraDistortionApp:
         self.mainwindow.mainloop()
 
 
-if sys.platform.lower().startswith('win'):
-    """
-    In windows the application fails to start if the it is built in `windowed` mode, because the the package moviepy
-    tries to create a process in such a way, which causes error for the application built with pyinstaller.
-    Until it is not solved, `non-windowed` version will be built and the command window in Windows is hidden during 
-    running the application.
-    """
-    import ctypes
+# In windows the application fails to start if the it is built in `windowed` mode,
+# because the the package moviepy tries to create a process in such a way,
+# which causes error for the application built with pyinstaller.
+# Until it is not solved, `non-windowed` version will be built
+# and the command window in Windows is hidden during running the application.
 
+
+if sys.platform.lower().startswith("win"):
+
+    import ctypes
 
     def hide_console():
         """
@@ -465,7 +517,6 @@ if sys.platform.lower().startswith('win'):
         if whnd != 0:
             ctypes.windll.user32.ShowWindow(whnd, 0)
 
-
     def show_console():
         """
         Show console window
@@ -473,22 +524,29 @@ if sys.platform.lower().startswith('win'):
         whnd = ctypes.windll.kernel32.GetConsoleWindow()
         if whnd != 0:
             ctypes.windll.user32.ShowWindow(whnd, 1)
-else:
-    def hide_console():
-        pass
 
+
+else:
+
+    def hide_console():
+        """
+        Hide console in non-Windows systems
+        """
 
     def show_console():
-        pass
+        """
+        Show console in non-Windows systems
+        """
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     init_logger(CameraDistortionApp.logger)
-    app_frozen = getattr(sys, 'frozen', False)
-    if app_frozen:
+    APP_FROZEN = getattr(sys, "frozen", False)
+    if APP_FROZEN:
         hide_console()
 
     app = CameraDistortionApp()
     app.run()
 
-    if app_frozen:
+    if APP_FROZEN:
         show_console()
