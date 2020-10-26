@@ -25,6 +25,11 @@ jobs:
           .venv/bin/pip install -r requirements.txt
       - name: Move the dependencies
         run: mv .venv /home/runner/work/_temp/_github_workflow
+      - name: Link configuration
+        run: |
+          mkdir ./.github/linters
+          ln -sf ./.python-lint ./.github/linters/.python-lint
+          ln -sf ./.flake8 ./.github/linters/.flake8
       - name: Lint
         uses: github/super-linter@v3
         env:
