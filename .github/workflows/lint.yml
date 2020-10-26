@@ -21,15 +21,15 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: Link configuration
-        run: |
-          mkdir ./.github/linters
-          ln -sf ./.python-lint ./.github/linters/.python-lint
-          ln -sf ./.flake8 ./.github/linters/.flake8
+          python -m venv .venv
+          .venv/bin/pip install -r requirements.txt
+      - name: Move the dependencies
+        run: mv .venv /home/runner/work/_temp/_github_workflow
       - name: Lint
         uses: github/super-linter@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_MARKDOWN: false
           LINTER_RULES_PATH: .
+          PYTHONPATH: "/github/workspace/:\
+                        /github/workflow/.venv/lib/python3.7/site-packages"
