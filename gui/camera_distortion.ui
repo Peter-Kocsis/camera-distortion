@@ -8,7 +8,7 @@
     <property name="title" translatable="yes">Media undistortion</property>
     <property name="width">720</property>
     <child>
-      <object class="ttk.Frame" id="main_frame">
+      <object class="tk.Frame" id="main_frame">
         <property name="height">360</property>
         <property name="width">720</property>
         <layout manager="pack">
@@ -17,6 +17,127 @@
           <property name="propagate">True</property>
           <property name="side">top</property>
         </layout>
+        <child>
+          <object class="tk.Frame" id="calibration_frame">
+            <property name="height">200</property>
+            <property name="width">200</property>
+            <layout manager="pack">
+              <property name="expand">false</property>
+              <property name="fill">x</property>
+              <property name="propagate">True</property>
+              <property name="side">top</property>
+            </layout>
+            <child>
+              <object class="tk.Frame" id="collect_frame">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="expand">true</property>
+                  <property name="fill">x</property>
+                  <property name="propagate">True</property>
+                  <property name="side">top</property>
+                </layout>
+                <child>
+                  <object class="tk.Button" id="collect_button">
+                    <property name="text" translatable="yes">Collect calibration images</property>
+                    <bind add="" handler="_on_collect_button" sequence="&lt;1&gt;" />
+                    <layout manager="pack">
+                      <property name="propagate">True</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.Frame" id="collect_input_frame">
+                    <property name="height">200</property>
+                    <property name="width">200</property>
+                    <layout manager="pack">
+                      <property name="expand">true</property>
+                      <property name="fill">x</property>
+                      <property name="propagate">True</property>
+                      <property name="side">top</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Button" id="browse_collect_button">
+                        <property name="text" translatable="yes">Browse calibration video</property>
+                        <bind add="" handler="_on_browse_collect_button" sequence="&lt;1&gt;" />
+                        <layout manager="pack">
+                          <property name="propagate">True</property>
+                          <property name="side">left</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="collect_entry">
+                        <layout manager="pack">
+                          <property name="expand">true</property>
+                          <property name="fill">both</property>
+                          <property name="propagate">True</property>
+                          <property name="side">left</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Frame" id="calibrate_frame">
+                <property name="height">200</property>
+                <property name="width">200</property>
+                <layout manager="pack">
+                  <property name="expand">true</property>
+                  <property name="fill">x</property>
+                  <property name="propagate">True</property>
+                  <property name="side">bottom</property>
+                </layout>
+                <child>
+                  <object class="tk.Button" id="calibrate_button">
+                    <property name="text" translatable="yes">Calibrate</property>
+                    <bind add="" handler="_on_calibrate_button" sequence="&lt;1&gt;" />
+                    <layout manager="pack">
+                      <property name="propagate">True</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.Frame" id="calibrate_input_frame">
+                    <property name="height">200</property>
+                    <property name="width">200</property>
+                    <layout manager="pack">
+                      <property name="expand">true</property>
+                      <property name="fill">x</property>
+                      <property name="propagate">True</property>
+                      <property name="side">top</property>
+                    </layout>
+                    <child>
+                      <object class="tk.Button" id="browse_calibrate_button">
+                        <property name="text" translatable="yes">Browse calibration image folder</property>
+                        <bind add="" handler="_on_browse_calibrate_button" sequence="&lt;1&gt;" />
+                        <layout manager="pack">
+                          <property name="propagate">True</property>
+                          <property name="side">left</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="tk.Entry" id="calibrate_entry">
+                        <property name="textvariable">string:calibrate_entry_var</property>
+                        <layout manager="pack">
+                          <property name="expand">true</property>
+                          <property name="fill">both</property>
+                          <property name="propagate">True</property>
+                          <property name="side">left</property>
+                        </layout>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
         <child>
           <object class="tk.Frame" id="input_frame">
             <property name="height">300</property>
@@ -28,7 +149,7 @@
               <property name="side">top</property>
             </layout>
             <child>
-              <object class="tk.Frame" id="camera_parameter_frame">
+              <object class="tk.Frame" id="camera_parameter_input_frame">
                 <property name="height">300</property>
                 <property name="width">360</property>
                 <layout manager="pack">
@@ -38,9 +159,9 @@
                   <property name="side">top</property>
                 </layout>
                 <child>
-                  <object class="tk.Button" id="camera_parameters_button">
-                    <property name="text" translatable="yes">Camera parameters</property>
-                    <bind add="" handler="on_camera_parameters_button" sequence="&lt;1&gt;" />
+                  <object class="tk.Button" id="browse_camera_parameters_button">
+                    <property name="text" translatable="yes">Browse parameters</property>
+                    <bind add="" handler="_on_browse_camera_parameters_button" sequence="&lt;1&gt;" />
                     <layout manager="pack">
                       <property name="propagate">True</property>
                       <property name="side">left</property>
@@ -48,7 +169,8 @@
                   </object>
                 </child>
                 <child>
-                  <object class="ttk.Entry" id="camera_parameter_entry">
+                  <object class="tk.Entry" id="camera_parameter_entry">
+                    <property name="textvariable">string:camera_parameter_entry_var</property>
                     <layout manager="pack">
                       <property name="expand">true</property>
                       <property name="fill">both</property>
@@ -80,9 +202,9 @@
                   </object>
                 </child>
                 <child>
-                  <object class="tk.Button" id="input_media_button">
-                    <property name="text" translatable="yes">Input media</property>
-                    <bind add="" handler="on_input_media_button" sequence="&lt;1&gt;" />
+                  <object class="tk.Button" id="browse_input_media_button">
+                    <property name="text" translatable="yes">Browse input media</property>
+                    <bind add="" handler="_on_browse_input_media_button" sequence="&lt;1&gt;" />
                     <layout manager="pack">
                       <property name="propagate">True</property>
                       <property name="side">top</property>
@@ -104,7 +226,7 @@
             <child>
               <object class="tk.Button" id="start_button">
                 <property name="text" translatable="yes">Start</property>
-                <bind add="" handler="on_start_button" sequence="&lt;1&gt;" />
+                <bind add="" handler="_on_start_button" sequence="&lt;1&gt;" />
                 <layout manager="pack">
                   <property name="propagate">True</property>
                   <property name="side">left</property>
@@ -112,39 +234,51 @@
               </object>
             </child>
             <child>
-              <object class="ttk.Button" id="output_path_button">
-                <property name="text" translatable="yes">Output</property>
-                <bind add="" handler="on_output_path_button" sequence="&lt;1&gt;" />
-                <layout manager="pack">
-                  <property name="propagate">True</property>
-                  <property name="side">left</property>
-                </layout>
-              </object>
-            </child>
-            <child>
-              <object class="ttk.Entry" id="output_path_entry">
+              <object class="tk.Frame" id="output_input_frame">
+                <property name="height">200</property>
+                <property name="width">200</property>
                 <layout manager="pack">
                   <property name="expand">true</property>
-                  <property name="fill">both</property>
+                  <property name="fill">x</property>
                   <property name="propagate">True</property>
-                  <property name="side">left</property>
+                  <property name="side">top</property>
                 </layout>
+                <child>
+                  <object class="tk.Button" id="browse_output_path_button">
+                    <property name="text" translatable="yes">Browse output path</property>
+                    <bind add="" handler="_on_browse_output_path_button" sequence="&lt;1&gt;" />
+                    <layout manager="pack">
+                      <property name="propagate">True</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
+                <child>
+                  <object class="tk.Entry" id="output_path_entry">
+                    <layout manager="pack">
+                      <property name="expand">true</property>
+                      <property name="fill">both</property>
+                      <property name="propagate">True</property>
+                      <property name="side">left</property>
+                    </layout>
+                  </object>
+                </child>
               </object>
             </child>
           </object>
         </child>
         <child>
-          <object class="ttk.Frame" id="status_frame">
+          <object class="tk.Frame" id="status_frame">
             <property name="height">200</property>
             <property name="width">200</property>
             <layout manager="pack">
               <property name="expand">false</property>
               <property name="fill">x</property>
               <property name="propagate">True</property>
-              <property name="side">bottom</property>
+              <property name="side">top</property>
             </layout>
             <child>
-              <object class="ttk.Label" id="status_label">
+              <object class="tk.Label" id="status_label">
                 <property name="anchor">w</property>
                 <property name="borderwidth">1</property>
                 <property name="relief">sunken</property>
