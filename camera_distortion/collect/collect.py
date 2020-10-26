@@ -50,6 +50,7 @@ def collect_calibration_images_argsparser() -> argparse.ArgumentParser:
     return parser
 
 
+# pylint: disable=unsubscriptable-object
 def collect_calibration_images(
     video_path: str, output_path: Union[str, None], num_of_images: int
 ):

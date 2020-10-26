@@ -59,6 +59,7 @@ def get_image_format(extension: str):
     return extension[1:]
 
 
+# pylint: disable=unsubscriptable-object
 def find_images(paths: Union[str, List[str]]) -> List[str]:
     """
     Finds image files
@@ -71,6 +72,7 @@ def find_images(paths: Union[str, List[str]]) -> List[str]:
     return image_files
 
 
+# pylint: disable=unsubscriptable-object
 def find_videos(pathes: Union[str, List[str]]) -> List[str]:
     """
     Finds video files
@@ -83,6 +85,7 @@ def find_videos(pathes: Union[str, List[str]]) -> List[str]:
     return video_files
 
 
+# pylint: disable=unsubscriptable-object
 def find_files(
     paths: Union[str, List[str]], extensions: Union[List[str], None] = None
 ) -> List[str]:

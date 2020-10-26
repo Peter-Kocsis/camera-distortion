@@ -143,6 +143,7 @@ def undistort_image(
     logger.info("Undistorted image file saved to %s", undistorted_image_path)
 
 
+# pylint: disable=unsubscriptable-object
 def undistort(
     media_path: Union[List[str], str],
     out_folder: str,
