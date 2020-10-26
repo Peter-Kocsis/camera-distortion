@@ -1,28 +1,37 @@
-"""Script for determining the camera calibration parameters"""
+#!/usr/bin/env python
+"""
+The parameters of the camera model can be calculated from images taken about known calibration patterns.
+This module supports only checkerboard calibration pattern,
+you can find one here: https://github.com/Peter-Kocsis/camera-distortion/tree/main/calibration_images
+
+The calibration images should be clear, not blurred and the calibration pattern needs to be visible.
+"""
 __author__ = "Peter Kocsis"
 __copyright__ = "Peter Kocsis"
-__credits__ = []
+__credits__ = ["MIT License"]
 __version__ = "0.1"
 __maintainer__ = "Peter Kocsis"
 __email__ = "peter.kocsis@tum.de"
-__status__ = "Beta"
+__status__ = "Released"
 
 import argparse
 import logging
 import os
 import sys
 
-# create logger
-from camera_distortion.camera_parameters import CameraParameters
 from util import init_logger
+from camera_distortion.camera_model import CameraModel
 
 logger = logging.getLogger(__file__)
 
 
 def calibrate_argsparser() -> argparse.ArgumentParser:
-    """Returns a parser for the script's arguments"""
+    """
+    Creates a parser for the script's arguments
+    :returns: ArgumentParser object for parsing the script's arguments
+    """
     parser = argparse.ArgumentParser(description="Script for determining the camera calibration parameters."
-                                                 "It requires images about the calibration template in different poses.")
+                                                 "It requires images about the calibration pattern in different poses.")
     parser.add_argument("-i", "--images", type=str,
                         help="Path of the folder containing calibration images")
     parser.add_argument("-cam", "--camera", type=str, default="custom", help="The name of the camera")
@@ -38,12 +47,17 @@ def calibrate_argsparser() -> argparse.ArgumentParser:
     return parser
 
 
-def calibrate(image_folder_path: str, calib_width: int, calib_height: int, calib_size: float, camera_name:str, show_points: bool):
+def calibrate(image_folder_path: str,
+              calib_width: int,
+              calib_height: int,
+              calib_size: float,
+              camera_name: str,
+              show_points: bool) -> str:
     """
-    This function determines the camera calibration parameters using 'png' and 'jpg' calibration image_pathes
-    about a checkerboard calibration image which can be used for undistortion later.
+    This function determines the camera calibration parameters using 'png' and 'jpg' calibration images
+    about a checkerboard calibration image.
     It is assumed that the checkerboard squares are square.
-    The checkerboard corners are located on the grayscale image. If the points are not found that image
+    The checkerboard corners are located on the grayscale image. If the points are not found, the image
     is skipped.
 
     :param image_folder_path: Path of the folder containing calibration image_pathes
@@ -52,10 +66,11 @@ def calibrate(image_folder_path: str, calib_width: int, calib_height: int, calib
     :param calib_size: Size of a single square block [cm]
     :param camera_name: The name of the camera
     :param show_points: Indicates whether to show calibration points or not
+    :returns: Path to the created parameter file
     """
     # Calculate the camera parameters
-    camera_parameters, total_reproj_error = CameraParameters.from_images(image_folder_path, calib_width, calib_height, calib_size,
-                                                     camera_name, show_points)
+    camera_parameters, total_reproj_error = \
+        CameraModel.from_images(image_folder_path, calib_width, calib_height, calib_size, camera_name, show_points)
 
     # Show parameters
     logger.debug(f"Camera parameters: {str(camera_parameters)}")
@@ -67,6 +82,7 @@ def calibrate(image_folder_path: str, calib_width: int, calib_height: int, calib
 
     logger.info(f"Calibration finished, total reprojection error: {total_reproj_error}, "
                 f"parameters saved to {parameter_file}")
+    return parameter_file
 
 
 if __name__ == '__main__':

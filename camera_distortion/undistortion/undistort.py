@@ -1,11 +1,16 @@
-"""Script for determining the camera calibration parameters"""
+#!/usr/bin/env python
+"""
+Knowing the camera distortion model one can find a mapping between the distorted and undistorted point coordinates,
+which can be used to restore the undistorted image. To be efficient, the camera models uses invertible, which allows
+to calculate the mapping in closed from.
+"""
 __author__ = "Peter Kocsis"
 __copyright__ = "Peter Kocsis"
-__credits__ = []
+__credits__ = ["MIT License"]
 __version__ = "0.1"
 __maintainer__ = "Peter Kocsis"
 __email__ = "peter.kocsis@tum.de"
-__status__ = "Beta"
+__status__ = "Released"
 
 import argparse
 import logging
@@ -18,7 +23,7 @@ import numpy as np
 from PIL import Image
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
-from camera_distortion.camera_parameters import CameraParameters
+from camera_distortion.camera_model import CameraModel
 from util import init_logger
 from util.io import get_format, find_videos, find_images
 
@@ -26,20 +31,31 @@ logger = logging.getLogger(__file__)
 
 
 def undistort_argsparser() -> argparse.ArgumentParser:
-    """Returns a parser for the script's arguments"""
-    parser = argparse.ArgumentParser(description="Script for determining the camera calibration parameters."
-                                                 "It requires images about the calibration template in different poses.")
-    parser.add_argument('image_path', type=str, nargs='+',
-                        help='Pathes of the images')
+    """
+    Creates a parser for the script's arguments
+    :returns: ArgumentParser object for parsing the script's arguments
+    """
+    parser = argparse.ArgumentParser(description="Script for undistorting media files given the camera model.")
+    parser.add_argument('media_path', type=str, nargs='+',
+                        help='Path or list of paths of the media files')
     parser.add_argument("-p", "--parameters", type=str,
                         help="Path of the file containing the camera parameters")
-    parser.add_argument("-c", "--crop", type=float, default=0.0, help="Ratio of cropping the undistorted image. "
-                                                         "0 will crop all the black pixels, 1 keeps all the pixels")
+    parser.add_argument("-c", "--crop", type=float, default=0.0,
+                        help="Ratio of cropping the undistorted image. "
+                             "0 will crop all the black pixels, 1 keeps all the pixels")
     parser.add_argument("-o", "--out_folder", type=str, help="The output folder")
     return parser
 
 
-def undistort_video(video_path: str, out_folder: str, camera_parameters: CameraParameters, crop: float):
+def undistort_video(video_path: str, out_folder: str, camera_model: CameraModel, crop: float):
+    """
+    Undistorts a single video given the camera parameters but keeps the meta-data
+
+    :param video_path: Path or list of paths of the media files
+    :param out_folder: The output folder path
+    :param camera_model: The camera model object
+    :param crop: Ratio of cropping the undistorted image. 0 will crop all the black pixels, 1 keeps all the pixels
+    """
     os.makedirs(out_folder, exist_ok=True)
     logger.info(f"Undistorting video file {video_path}")
     # Read video
@@ -52,7 +68,7 @@ def undistort_video(video_path: str, out_folder: str, camera_parameters: CameraP
     logger.debug(f"Video file {video_path} read")
 
     # Undistort video
-    undistorted_video = camera_parameters.undistort_video(video, crop)
+    undistorted_video = camera_model.undistort_video(video, crop)
     logger.debug(f"Video file {video_path} undistorted")
 
     # Save undistorted video
@@ -69,7 +85,15 @@ def undistort_video(video_path: str, out_folder: str, camera_parameters: CameraP
     logger.info(f"Undistorted video file saved to {undistorted_video_path}")
 
 
-def undistort_image(image_path:str, out_folder: str, camera_parameters: CameraParameters, crop: float):
+def undistort_image(image_path: str, out_folder: str, camera_model: CameraModel, crop: float):
+    """
+    Undistorts a single image given the camera parameters but keeps the meta-data
+
+    :param image_path: Path or list of paths of the media files
+    :param out_folder: The output folder path
+    :param camera_model: The camera model object
+    :param crop: Ratio of cropping the undistorted image. 0 will crop all the black pixels, 1 keeps all the pixels
+    """
     os.makedirs(out_folder, exist_ok=True)
     logger.info(f"Undistorting image file {image_path}")
 
@@ -79,7 +103,7 @@ def undistort_image(image_path:str, out_folder: str, camera_parameters: CameraPa
 
     # Undistort image
     image_data = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
-    undistorted_image_data = camera_parameters.undistort_image(image_data, crop)
+    undistorted_image_data = camera_model.undistort_image(image_data, crop)
     undistorted_image = Image.fromarray(cv2.cvtColor(np.array(undistorted_image_data), cv2.COLOR_BGR2RGB))
     logger.debug(f"Image file {image_path} undistorted")
 
@@ -93,22 +117,23 @@ def undistort_image(image_path:str, out_folder: str, camera_parameters: CameraPa
 
 def undistort(media_path: Union[List[str], str], out_folder: str, parameters_file: str, crop: float):
     """
-    This function undistorts media files given the camera parameters
+    Undistorts media files given the camera parameters but keeps the meta-data
 
-    :param media_pathes: Pathes of the images
+    :param media_path: Path or list of pathes of the media files
+    :param out_folder: The output folder path
     :param parameters_file: Path of the camera parameter file
     :param crop: Ratio of cropping the undistorted image. 0 will crop all the black pixels, 1 keeps all the pixels
     """
-    camera_parameters = CameraParameters.from_json(parameters_file)
+    camera_model = CameraModel.from_json(parameters_file)
     os.makedirs(out_folder, exist_ok=True)
 
     logger.info(f"Undistorting images")
     for image_path in find_images(media_path):
-        undistort_image(image_path, out_folder, camera_parameters, crop)
+        undistort_image(image_path, out_folder, camera_model, crop)
 
     logger.info(f"Undistorting videos")
     for video_path in find_videos(media_path):
-        undistort_video(video_path, out_folder, camera_parameters, crop)
+        undistort_video(video_path, out_folder, camera_model, crop)
 
     logger.info(f"Undistorsion finished!")
 
@@ -116,7 +141,7 @@ def undistort(media_path: Union[List[str], str], out_folder: str, parameters_fil
 if __name__ == '__main__':
     arguments = undistort_argsparser().parse_args(sys.argv[1:])
     init_logger(logger)
-    undistort(media_path=arguments.image_path,
+    undistort(media_path=arguments.media_path,
               out_folder=arguments.out_folder,
               parameters_file=arguments.parameters,
               crop=arguments.crop)

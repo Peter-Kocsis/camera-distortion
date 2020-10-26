@@ -1,27 +1,36 @@
-"""Module for collecting calibration images from video"""
+#!/usr/bin/env python
+"""
+The calibration images can be extracted from a calibration video. The extracted images will be saved in a given
+folder and then they can be used for calibration.
+
+The extracted images should be clear, not blurred and the calibration pattern needs to be visible.
+"""
 __author__ = "Peter Kocsis"
 __copyright__ = "Peter Kocsis"
-__credits__ = []
+__credits__ = ["MIT License"]
 __version__ = "0.1"
 __maintainer__ = "Peter Kocsis"
 __email__ = "peter.kocsis@tum.de"
-__status__ = "Beta"
+__status__ = "Released"
 
-import argparse
-import logging
 import os
 import sys
-from typing import Union
-
+import argparse
+import logging
 import cv2
 
-# create logger
+from typing import Union
+
 from util import init_logger
 
 logger = logging.getLogger(__file__)
 
-def calibrate_argsparser() -> argparse.ArgumentParser:
-    """Returns a parser for the script's arguments"""
+
+def collect_calibration_images_argsparser() -> argparse.ArgumentParser:
+    """
+    Creates a parser for the script's arguments
+    :returns: ArgumentParser object for parsing the script's arguments
+    """
     parser = argparse.ArgumentParser(description="Script for aquiring calibration images from video.")
     parser.add_argument("-v", "--video", type=str, help="Path of the video for camera calibration")
     parser.add_argument("-o", "--out_folder ", type=str, default=None,
@@ -33,14 +42,11 @@ def calibrate_argsparser() -> argparse.ArgumentParser:
 
 def collect_calibration_images(video_path: str, output_path: Union[str, None], num_of_images: int):
     """
-    This function loads the video file into a data space called video. It then collects various
-    meta-data about the file for later inputs. The function then enters a loop in which it loops
-    through each image, displays the image and waits for a fixed amount of time before displaying
-    the next image. The playback speed can be adjusted in the waitKey command.  During the loop
-    checkerboard images can be collected by pressing the spacebar.  Each image will be saved as a
-    *.png into the directory which stores this file.  The ESC key will terminate the function.
-    The function will end once the correct number of images are collected or the video ends.
-    For the processing step, try to collect all the images before the video ends.
+    Collects calibration images from a video file
+
+    This function loads the video and starts playing it and looping until the required number of images are gathered.
+    The playback speed can be adjusted by pressing + or -. To save the current image, press SPACE_BAR.
+    The process can be interrupted by pressing ESC.
 
     :param video_path: Path to the video from that the calibration images will be aquired
     :param output_path: Path of the output folder (the same folder as the video if None)
@@ -67,7 +73,7 @@ def collect_calibration_images(video_path: str, output_path: Union[str, None], n
     # Initializes variables
     collected_images = 0
     frame_duration_rates = [0.125, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 2.5, 3.0]
-    frame_duration_ratio_idx = 4 # => 1.0
+    frame_duration_ratio_idx = 4
 
     # Create output folder
     if output_path is None:
@@ -120,7 +126,7 @@ def collect_calibration_images(video_path: str, output_path: Union[str, None], n
 
 
 if __name__ == '__main__':
-    arguments = calibrate_argsparser().parse_args(sys.argv[1:])
+    arguments = collect_calibration_images_argsparser().parse_args(sys.argv[1:])
     init_logger(logger)
     collect_calibration_images(video_path=arguments.video,
                                output_path=arguments.out_folder,
