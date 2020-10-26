@@ -1,14 +1,25 @@
 # Camera distorsion
 ![example workflow name](https://github.com/Peter-Kocsis/camera-distortion/workflows/Build/badge.svg)
 
-A module for handling camera distorsion. Originally developed for fisheye-removal.
+A module for handling camera distorsion, originally developed for fisheye-removal. The project is written in Python, consists of a pacakge and an application for media undistortion. 
 
 ### Features
-* Camera calibration: Determine the intrinsic camera parameters
-* Image undistorsion
-* Video undistorsion
+* **Camera calibration**: Determine the intrinsic camera parameters from calibration images or calibration video
+* **Image undistorsion**: Undistort images given the intrinsic camera parameters
+* **Video undistorsion**: Undistort videos given the intrinsic camera parameters
 
 ## Python package
+
+The `camera_distortion` module is developed for easily undistort images and videos. Currently, it has three main submodules:
+
+### Collect
+Collecting calibration images from a video sequence
+
+### Calibration 
+Calculating intrinsic parameters from calibration images
+
+### Undistortion
+Undistorting images and videos given the intrinsic camera parameters
 
 ### Installation
 TBD
