@@ -112,7 +112,7 @@ class CameraModel:
     @classmethod
     def _find_calibration_points_on_image(
         cls,
-        image_paths: Union[List[str], str], # pylint: disable=unsubscriptable-object
+        image_paths: Union[List[str], str],  # pylint: disable=unsubscriptable-object
         calib_pattern: CalibrationPattern,
         show_points: bool,
     ) -> Tuple[list, list, Tuple[int, int]]:
@@ -235,7 +235,7 @@ class CameraModel:
     @classmethod
     def from_images(
         cls,
-        image_paths: Union[List[str], str], # pylint: disable=unsubscriptable-object
+        image_paths: Union[List[str], str],  # pylint: disable=unsubscriptable-object
         calib_pattern: CalibrationPattern,
         camera_name: str = "custom",
         show_points: bool = False,
