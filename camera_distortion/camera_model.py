@@ -22,7 +22,7 @@ import numpy as np
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 from util import serialize
-from util.io import find_files
+from util.io import find_images
 
 
 class CameraModel:
@@ -96,7 +96,7 @@ class CameraModel:
                 i.e. no calibration pattern could be recognized on any of them
         """
         # Find images
-        image_pathes = find_files(image_pathes)
+        image_pathes = find_images(image_pathes)
         n_images = len(image_pathes)
         cls.logger.info(f"Calculating camera calibration from {image_pathes} - {n_images} images found")
 
@@ -174,7 +174,7 @@ class CameraModel:
         ret, intrinsic_matrix, dist_coefficients, rvecs, tvecs = \
             cv2.calibrateCamera(calib_object_points, calib_det_points, grey_image.shape[::-1], None, None)
 
-        obj = cls.from_values(camera_name, intrinsic_matrix / image_size, dist_coefficients)
+        obj = cls.from_values(camera_name, intrinsic_matrix / np.append(image_size, 1)[:, None], dist_coefficients)
 
         # Calculate the total reprojection error.  The closer to zero the better.
         tot_error = 0
