@@ -1,6 +1,6 @@
 # Camera distorsion
-![Build](https://github.com/Peter-Kocsis/camera-distortion/workflows/Build/badge.svg)
-![Lint](https://github.com/Peter-Kocsis/camera-distortion/workflows/Lint/badge.svg)
+[![Build](https://github.com/Peter-Kocsis/camera-distortion/workflows/Build/badge.svg)](https://github.com/Peter-Kocsis/camera-distortion/actions?query=workflow%3ABuild)
+[![Lint](https://github.com/Peter-Kocsis/camera-distortion/workflows/Lint/badge.svg)](https://github.com/Peter-Kocsis/camera-distortion/actions?query=workflow%3ALint)
 
 A module for handling camera distorsion, originally developed for fisheye-removal. The project is written in Python, consists of a pacakge and an application for media undistortion. 
 
