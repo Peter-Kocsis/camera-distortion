@@ -22,7 +22,6 @@ jobs:
           - os: windows-latest
             data_separator: ";"
             tkdnd_install_sript: "./gui/install_tkdnd.bat"
-            site_packages: "C:\hostedtoolcache\windows\Python\3.7.9\x64"
           - os: macos-latest
             data_separator: ":"
             tkdnd_install_sript: "bash ./gui/install_tkdnd.sh"
