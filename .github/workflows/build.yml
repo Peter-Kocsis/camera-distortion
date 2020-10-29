@@ -40,8 +40,6 @@ jobs:
       run: |
         ${{ matrix.tkdnd_install_sript }}
     - name: Build
-      env:
-        site_packages: "${{ python -c 'import site; print(site.getsitepackages()[0]) }}"
       run: |
         pyinstaller
         --name media_undistortion
