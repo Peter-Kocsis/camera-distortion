@@ -22,9 +22,11 @@ jobs:
           - os: windows-latest
             data_separator: ";"
             tkdnd_install_sript: "./gui/install_tkdnd.bat"
+            site_packages: "C:\hostedtoolcache\windows\Python\3.7.9\x64"
           - os: macos-latest
             data_separator: ":"
             tkdnd_install_sript: "bash ./gui/install_tkdnd.sh"
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.7
@@ -36,14 +38,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pyinstaller
-    - name: Install TkDnD
+    - name: Echoing
       run: |
-        ${{ matrix.tkdnd_install_sript }}
-    - name: Build
-      run: |
-        pyinstaller --name media_undistortion --add-data "./gui/camera_distortion.ui${{ matrix.data_separator }}." --add-data "./gui/icon.png${{ matrix.data_separator }}." --add-data "./tkdnd2.8${{ matrix.data_separator }}./tkdnd2.8" --add-binary "$(python -c 'import site; print(site.getsitepackages()[0])')/cv2/qt${{ matrix.data_separator }}./cv2/qt" --add-binary "$(python -c 'import site; print(site.getsitepackages()[0])')/opencv_python.libs${{ matrix.data_separator }}./opencv_python.libs" --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
-    - name: Archive build
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ runner.os }}
-        path: dist
+        echo "$(python -c 'import site; print(site.getsitepackages()[0])'), $(python -m site --user-site)"
