@@ -96,35 +96,35 @@ The prebuilt binaries can be found in the latest release.
 
 **1.** Run the program! 
 
-![Media undistortion app start]("/res/0_empty_window.png)
+![Media undistortion app start](res/0_empty_window.png "0_empty_window")
 
 **2.** Choose the calibration video! 
 
-![Media undistortion calib video chosen]("/res/1_choose_calib_video.png)
+![Media undistortion calib video chosen](res/1_choose_calib_video.png "1_choose_calib_video")
 
 **3.** Start the calibration! 
 
-![Media undistortion app start]("/res/2_calib_images_collected.png)
+![Media undistortion app start](res/2_calib_images_collected.png "2_calib_images_collected")
 
 **4.** Wait for finish!
  
-![Media undistortion app start]("/res/3_calib_finished.png)
+![Media undistortion app start](res/3_calib_finished.png "3_calib_finished")
  
 **5.** Choose the input media and output path! 
 
-![Media undistortion app start]("/res/4_calib_finsihed_ready_to_start.png)
+![Media undistortion app start](res/4_calib_finsihed_ready_to_start.png "4_calib_finsihed_ready_to_start")
 
 **6.** Start the undistortion! 
 
-![Media undistortion app start]("/res/5_starting_to_undistort.png)
+![Media undistortion app start](res/5_starting_to_undistort.png "5_starting_to_undistort")
 
 **7.** Wait for every input to finish! 
 
-![Media undistortion app start]("/res/6_undistortion_in_progress.png)
+![Media undistortion app start](res/6_undistortion_in_progress.png "6_undistortion_in_progress")
 
 **8.** Success! 
 
-![Media undistortion app start]("/res/7_successful_undistortion.png)
+![Media undistortion app start](res/7_successful_undistortion.png "7_successful_undistortion")
 
 ### Local use and build
 
