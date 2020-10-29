@@ -2,8 +2,6 @@
 """
 Knowing the camera distortion model one can find a mapping between the distorted
 and undistorted point coordinates, which can be used to restore the undistorted image.
-To be efficient, the camera models uses invertible, which allows to calculate
-the mapping in closed from.
 """
 __author__ = "Peter Kocsis"
 __copyright__ = "Peter Kocsis"
