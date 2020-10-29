@@ -39,4 +39,4 @@ jobs:
         pip install pyinstaller
     - name: Echoing
       run: |
-        echo "$(python -c 'import site; print(site.getsitepackages()[0])'), $(python -m site --user-site)", $(python -c "import pip; print(pip.__path__[0].rstrip('/pip'))")
+        echo "$(python -c 'import site; print(site.getsitepackages()[0])'), $(python -m site --user-site)", $(python -c "import cv2; print(cv2.__path__[0].rstrip('/cv2'))")
