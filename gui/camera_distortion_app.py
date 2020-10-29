@@ -362,7 +362,7 @@ class CameraDistortionApp:
             )
             return
 
-        num_of_images = 2
+        num_of_images = 20
         output_path = os.path.join(os.path.dirname(video_path), "calib_images")
         collect_calibration_images(
             video_path=video_path, output_path=output_path, num_of_images=num_of_images

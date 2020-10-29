@@ -18,6 +18,7 @@ import sys
 import argparse
 import logging
 from typing import Union
+import tkinter as tk
 
 import cv2
 
@@ -38,7 +39,7 @@ def collect_calibration_images_argsparser() -> argparse.ArgumentParser:
         "-v", "--video", type=str, help="Path of the video for camera calibration"
     )
     parser.add_argument(
-        "-o", "--out_folder ", type=str, default=None, help="Path of the output folder"
+        "-o", "--out_folder", type=str, default=None, help="Path of the output folder"
     )
     parser.add_argument(
         "-n",
@@ -137,7 +138,8 @@ def collect_calibration_images(
         # ESC
         elif key_code == 27:
             logger.debug("ESC pressed, interrupting")
-            raise RuntimeError("The image collection has been interrupted!")
+            logger.info("The image collection has been interrupted!")
+            break
 
         # If the last frame is reached, reset the capture and the frame_counter
         if current_frame == video.get(cv2.CAP_PROP_FRAME_COUNT):
@@ -151,7 +153,7 @@ def collect_calibration_images(
     logger.info("Calibration images collected from %s", video_path)
 
 
-if __name__ == "__main__":
+def main():
     arguments = collect_calibration_images_argsparser().parse_args(sys.argv[1:])
     init_logger(logger)
     collect_calibration_images(
@@ -159,3 +161,7 @@ if __name__ == "__main__":
         output_path=arguments.out_folder,
         num_of_images=arguments.num_images,
     )
+
+
+if __name__ == "__main__":
+    main()

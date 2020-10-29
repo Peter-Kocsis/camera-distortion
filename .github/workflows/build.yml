@@ -25,6 +25,7 @@ jobs:
           - os: macos-latest
             data_separator: ":"
             tkdnd_install_sript: "bash ./gui/install_tkdnd.sh"
+
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.7
@@ -36,14 +37,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pyinstaller
-    - name: Install TkDnD
+    - name: Echoing
       run: |
-        ${{ matrix.tkdnd_install_sript }}
-    - name: Build 
-      run: |
-        pyinstaller --name media_undistortion --add-data "./gui/camera_distortion.ui${{ matrix.data_separator }}." --add-data "./gui/icon.png${{ matrix.data_separator }}." --add-data "./tkdnd2.8${{ matrix.data_separator }}./tkdnd2.8" --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
-    - name: Archive build
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ runner.os }}
-        path: dist
+        echo "$(python -c 'import site; print(site.getsitepackages()[0])'), $RUNNER_TOOL_CACHE"
