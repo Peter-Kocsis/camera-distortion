@@ -41,7 +41,7 @@ jobs:
         ${{ matrix.tkdnd_install_sript }}
     - name: Build
       run: |
-        pyinstaller
+        pyinstaller 
         --name media_undistortion
         --add-data "./gui/camera_distortion.ui${{ matrix.data_separator }}."
         --add-data "./gui/icon.png${{ matrix.data_separator }}."
