@@ -218,11 +218,13 @@ class CameraModel:
 
         # Calculate the total reprojection error.  The closer to zero the better.
         errors = []
-        for calib_object_point, rvec, tvec in zip(calib_object_points, rvecs, tvecs):
+        for calib_object_point, calib_det_point, rvec, tvec in zip(
+            calib_object_points, calib_det_points, rvecs, tvecs
+        ):
             image_points2, _ = cv2.projectPoints(
                 calib_object_point, rvec, tvec, intrinsic_matrix, dist_coefficients
             )
-            error = cv2.norm(calib_object_point, image_points2, cv2.NORM_L2) / len(
+            error = cv2.norm(calib_det_point, image_points2, cv2.NORM_L2) / len(
                 image_points2
             )
             errors.append(error)
