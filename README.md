@@ -154,7 +154,7 @@ pyinstaller --name media_undistortion --add-data "./gui/camera_distortion.ui:." 
 ```
 **Windows**:
 ```bash
-pyinstaller --name media_undistortion --add-data "./gui/camera_distortion.ui;." --add-data "./gui/icon.png;." --add-data "./tkdnd2.8;./tkdnd2.8" --hidden-import "pygubu.builder.tkstdwidgets" --add-binary "$(python -c 'import site; print(site.getsitepackages()[0])')/cv2/qt;./cv2/qt" --add-binary "$(python -c 'import site; print(site.getsitepackages()[0])')/opencv_python.libs;./opencv_python.libs" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
+pyinstaller --name media_undistortion --add-data "./gui/camera_distortion.ui;." --add-data "./gui/icon.png;." --add-data "./tkdnd2.8;./tkdnd2.8" --hidden-import "pygubu.builder.tkstdwidgets" --add-binary "<PATH_TO_SITE_PACKAGES>/cv2/qt;./cv2/qt" --add-binary "<PATH_TO_SITE_PACKAGES>/opencv_python.libs;./opencv_python.libs" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
 ```
 
 ## References

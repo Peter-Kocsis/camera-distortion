@@ -19,12 +19,15 @@ jobs:
           - os: ubuntu-latest
             data_separator: ":"
             tkdnd_install_sript: "bash ./gui/install_tkdnd.sh"
+            additional_binary: "--add-binary \"$(python -c 'import cv2; print(cv2.__path__[0])')/qt:./cv2/qt\" --add-binary \"$(python -c 'import cv2; print(cv2.__path__[0])')/../opencv_python.libs:./opencv_python.libs\""
           - os: windows-latest
             data_separator: ";"
             tkdnd_install_sript: "./gui/install_tkdnd.bat"
+            additional_binary: ""
           - os: macos-latest
             data_separator: ":"
             tkdnd_install_sript: "bash ./gui/install_tkdnd.sh"
+            additional_binary: ""
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.7
@@ -41,7 +44,7 @@ jobs:
         ${{ matrix.tkdnd_install_sript }}
     - name: Build
       run: |
-        pyinstaller --name media_undistortion --add-data "./gui/camera_distortion.ui${{ matrix.data_separator }}." --add-data "./gui/icon.png${{ matrix.data_separator }}." --add-data "./tkdnd2.8${{ matrix.data_separator }}./tkdnd2.8" --add-binary "$(python -c 'import cv2; print(cv2.__path__[0])')/qt${{ matrix.data_separator }}./cv2/qt" --add-binary "$(python -c 'import cv2; print(cv2.__path__[0])')/../opencv_python.libs${{ matrix.data_separator }}./opencv_python.libs" --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
+        pyinstaller --name media_undistortion ${{ matrix.additional_binary }} --add-data "./gui/camera_distortion.ui${{ matrix.data_separator }}." --add-data "./gui/icon.png${{ matrix.data_separator }}." --add-data "./tkdnd2.8${{ matrix.data_separator }}./tkdnd2.8" --hidden-import "pygubu.builder.tkstdwidgets" --hidden-import "pygubu.builder.ttkstdwidgets" --icon "./gui/icon.ico" --onefile ./gui/camera_distortion_app.py
     - name: Archive build
       uses: actions/upload-artifact@v2
       with:

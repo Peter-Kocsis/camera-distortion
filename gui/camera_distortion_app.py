@@ -125,8 +125,8 @@ class CameraDistortionApp:
                 f"global auto_path; lappend auto_path {{{tkdndlib}}}"
             )
             self.mainwindow.tk.call("package", "require", "tkdnd")
-        except tk.TclError:
-            CameraDistortionApp.logger.warning("Unable to load tkdnd library.")
+        except tk.TclError as e:
+            CameraDistortionApp.logger.warning("Unable to load tkdnd library, %s", e)
             return False
         return True
 
