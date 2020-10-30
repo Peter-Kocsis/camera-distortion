@@ -196,6 +196,7 @@ class CameraModel:
 
         return calib_object_points, calib_det_points, image_shape
 
+    # pylint: disable=too-many-locals
     @classmethod
     def _calibrate_model(
         cls,
@@ -228,11 +229,7 @@ class CameraModel:
                 image_points2
             )
             errors.append(error)
-        return (
-            intrinsic_matrix,
-            dist_coefficients,
-            sum(errors) / len(calib_object_points),
-        )
+        return intrinsic_matrix, dist_coefficients, sum(errors) / len(calib_object_points)
 
     @classmethod
     def from_images(
