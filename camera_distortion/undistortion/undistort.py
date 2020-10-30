@@ -23,8 +23,8 @@ from PIL import Image
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 from camera_distortion.camera_model import CameraModel
-from util.logger import init_logger
-from util.io import get_image_format, find_videos, find_images
+from camera_distortion.util.logger import init_logger
+from camera_distortion.util.io import get_image_format, find_videos, find_images
 
 logger = logging.getLogger(__file__)
 

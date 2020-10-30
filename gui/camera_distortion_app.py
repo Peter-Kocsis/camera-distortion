@@ -28,8 +28,8 @@ from camera_distortion.calibration import calibrate
 from camera_distortion.camera_model import CameraModel, CalibrationPattern
 from camera_distortion.collect import collect_calibration_images
 from camera_distortion.undistortion.undistort import undistort_image, undistort_video
-from util.logger import init_logger
-from util.io import find_images, find_videos
+from camera_distortion.util.logger import init_logger
+from camera_distortion.util.io import find_images, find_videos
 
 try:
     from TkinterDnD2 import DND_ALL

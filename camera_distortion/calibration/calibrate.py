@@ -20,7 +20,7 @@ import logging
 import os
 import sys
 
-from util.logger import init_logger
+from camera_distortion.util.logger import init_logger
 from camera_distortion import CameraModel, CalibrationPattern
 
 logger = logging.getLogger(__file__)

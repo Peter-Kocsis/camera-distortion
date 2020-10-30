@@ -19,8 +19,8 @@ from typing import Union, List, Tuple
 import cv2
 import numpy as np
 from moviepy.video.io.VideoFileClip import VideoFileClip
-from util.json import serialize
-from util.io import find_images
+from camera_distortion.util.json import serialize
+from camera_distortion.util.io import find_images
 
 
 class CalibrationPattern:

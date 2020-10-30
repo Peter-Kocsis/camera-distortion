@@ -18,11 +18,10 @@ import sys
 import argparse
 import logging
 from typing import Union
-import tkinter as tk
 
 import cv2
 
-from util.logger import init_logger
+from camera_distortion.util.logger import init_logger
 
 logger = logging.getLogger(__file__)
 
