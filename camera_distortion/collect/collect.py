@@ -152,7 +152,7 @@ def collect_calibration_images(
     logger.info("Calibration images collected from %s", video_path)
 
 
-def main():
+if __name__ == "__main__":
     arguments = collect_calibration_images_argsparser().parse_args(sys.argv[1:])
     init_logger(logger)
     collect_calibration_images(
@@ -160,7 +160,3 @@ def main():
         output_path=arguments.out_folder,
         num_of_images=arguments.num_images,
     )
-
-
-if __name__ == "__main__":
-    main()
