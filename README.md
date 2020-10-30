@@ -1,4 +1,4 @@
-# Camera distorsion
+# Camera distortion
 [![Build](https://github.com/Peter-Kocsis/camera-distortion/workflows/Build/badge.svg)](https://github.com/Peter-Kocsis/camera-distortion/actions?query=workflow%3ABuild)
 [![Lint](https://github.com/Peter-Kocsis/camera-distortion/workflows/Lint/badge.svg)](https://github.com/Peter-Kocsis/camera-distortion/actions?query=workflow%3ALint)
 
